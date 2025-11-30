@@ -1,0 +1,1876 @@
+<?php
+// chuyen doi thanh vnd
+if (!function_exists('currency_format')) {
+    function currency_format($number, $suffix = 'đ')
+    {
+        if (!empty($number)) {
+            return number_format($number, 0, ',', '.') . "<span>{$suffix}</span>"; // <span>đ</span>
+        }
+    }
+}
+ //echo currency_format(3700, 'USD');
+ // echo currency_format(70000000000);
+
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+};
+
+include 'components/add_cart.php';
+include './convert_currency.php';
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Trang chủ</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+
+   <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
+
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <?php include 'components/user_header.php'; ?>
+
+
+
+   <section class="hero">
+
+      <div class="swiper hero-slider">
+
+         <div class="swiper-wrapper">
+
+            <div class="swiper-slide slide">
+               <div class="content">
+                  <span>mua sắm</span>
+                  <h3>asus vivobook 14</h3>
+                  <a href="./product.php" class="btn">Hướng Tới Tương Lai</a>
+               </div>
+               <div class="image">
+                  <img src="imgs/home-1.png" alt="">
+               </div>
+            </div>
+
+            <div class="swiper-slide slide">
+               <div class="content">
+                  <span>mua sắm</span>
+                  <h3>acer predator</h3>
+                  <a href="./product.php" class="btn">Xem thêm</a>
+               </div>
+               <div class="image">
+                  <img src="imgs/home-2.png" alt="">
+               </div>
+            </div>
+
+            <div class="swiper-slide slide">
+               <div class="content">
+                  <span>mua sắm</span>
+                  <h3>MSI Katana 2024</h3>
+                  <a href="./product.php" class="btn">Thiết Kế Sang Trọng</a>
+               </div>
+               <div class="image">
+                  <img src="imgs/home-3.png" alt="">
+               </div>
+            </div>
+
+            <div class="swiper-slide slide">
+               <div class="content">
+                  <span>mua sắm</span>
+                  <h3>Razer Blade 15 Advanced</h3>
+                  <a href="./product.php" class="btn">Mạnh Mẽ- Bền Bỉ</a>
+               </div>
+               <div class="image">
+                  <img src="imgs/home-4.png" alt="">
+               </div>
+            </div>
+
+         </div>
+
+         <div class="swiper-pagination"></div>
+
+      </div>
+
+   </section>
+
+   <section class="category">
+
+      <h1 class="title">Mẫu Laptop</h1>
+
+      <div class="box-container">
+
+         <a href="category.php?category=asus" class="box">
+            <img src="imgs/asus.png" alt="">
+            <h3>asus</h3>
+         </a>
+
+         <a href="category.php?categor=acer" class="box">
+            <img src="imgs/acer.png" alt="">
+            <h3>acer</h3>
+         </a>
+
+         <a href="category.php?category=msi" class="box">
+            <img src="imgs/msi.png" alt="">
+            <h3>msi</h3>
+         </a>
+
+         <a href="category.php?category=razer" class="box">
+            <img src="imgs/razer.png" alt="">
+            <h3>razer</h3>
+         </a>
+
+      </div>
+
+   </section>
+
+
+   <section class="products">
+
+      <h1 class="title">laptop mới nhất</h1>
+
+      <div class="box-container">
+
+         <?php
+         $select_products = $conn->prepare("SELECT * FROM `products` LIMIT 6");
+         $select_products->execute();
+         if ($select_products->rowCount() > 0) {
+            while ($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)) {
+         ?>
+               <form action="" method="post" class="box">
+                  <input type="hidden" name="pid" value="<?= $fetch_products['id']; ?>">
+                  <input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
+                  <input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
+                  <input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
+                  <a href="quick_view.php?pid=<?= $fetch_products['id']; ?>" class="fas fa-eye"></a>
+                  <button type="submit" class="fas fa-shopping-cart" name="add_to_cart"></button>
+                  <img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
+                  <a href="category.php?category=<?= $fetch_products['category']; ?>" class="cat"><?= $fetch_products['category']; ?></a>
+                  <div class="name"><?= $fetch_products['name']; ?></div>
+                  <div class="flex">
+                     <div class="price"><?php echo currency_format($fetch_products['price']); ?></div>
+
+                     <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2">
+                  </div>
+               </form>
+         <?php
+            }
+         } else {
+            echo '<p class="empty">Không có sản phẩm để hiển thị!</p>';
+         }
+         ?>
+
+      </div>
+
+      <div class="more-btn">
+         <a href="./product.php" class="btn">Xem tất cả</a>
+      </div>
+
+   </section>
+
+
+
+   <?php include 'components/footer.php'; ?>
+
+
+   <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+   <script>
+      var swiper = new Swiper(".hero-slider", {
+         loop: true,
+         grabCursor: true,
+         effect: "flip",
+         pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+         },
+      });
+   </script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+};
+
+if (isset($_POST['submit'])) {
+
+   $email = $_POST['email'];
+   $email = filter_var($email, FILTER_SANITIZE_STRING);
+   $pass = sha1($_POST['pass']);
+   $pass = filter_var($pass, FILTER_SANITIZE_STRING);
+
+   $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ? AND password = ?");
+   $select_user->execute([$email, $pass]);
+   $row = $select_user->fetch(PDO::FETCH_ASSOC);
+
+   if ($select_user->rowCount() > 0) {
+      $_SESSION['user_id'] = $row['id'];
+      header('location:home.php');
+   } else {
+      $message[] = 'Sai tài khoản hoặc mật khẩu!';
+   }
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Đăng nhập</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <!-- header section starts  -->
+   <?php include 'components/user_header.php'; ?>
+   <!-- header section ends -->
+
+   <section class="form-container">
+
+      <form action="" method="post">
+         <h3>Đăng nhập</h3>
+         <input type="email" name="email" required placeholder="Nhập email của bạn" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+         <input type="password" name="pass" required placeholder="Nhập mật khẩu của bạn" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+         <input type="submit" value="Đăng nhập" name="submit" class="btn">
+         <p>Bạn chưa có tài khoản? <a href="register.php">Đăng ký ngay</a></p>
+      </form>
+
+   </section>
+
+
+   <?php include 'components/footer.php'; ?>
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+   header('location:home.php');
+};
+include './convert_currency.php';
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Đặt hàng</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <!-- header section starts  -->
+   <?php include 'components/user_header.php'; ?>
+   <!-- header section ends -->
+
+   <div class="heading">
+      <h3>Đặt hàng</h3>
+      <p><a href="home.php">Trang chủ</a> <span> / Đặt hàng</span></p>
+   </div>
+
+   <section class="orders">
+
+      <h1 class="title">Đơn hàng của bạn</h1>
+
+      <div class="box-container">
+
+         <?php
+         if ($user_id == '') {
+            echo '<p class="empty">vui lòng đăng nhập để xem đơn hàng của bạn!</p>';
+         } else {
+            $select_orders = $conn->prepare("SELECT * FROM `orders` WHERE user_id = ?");
+            $select_orders->execute([$user_id]);
+            if ($select_orders->rowCount() > 0) {
+               while ($fetch_orders = $select_orders->fetch(PDO::FETCH_ASSOC)) {
+         ?>
+                  <div class="box">
+                     <p>Thời gian : <span><?= $fetch_orders['placed_on']; ?></span></p>
+                     <p>Tên khách hàng : <span><?= $fetch_orders['name']; ?></span></p>
+                     <p>Email : <span><?= $fetch_orders['email']; ?></span></p>
+                     <p>Số điện thoại : <span><?= $fetch_orders['number']; ?></span></p>
+                     <p>Địa chỉ : <span><?= $fetch_orders['address']; ?></span></p>
+                     <p>Hình thức thanh toán : <span><?= $fetch_orders['method']; ?></span></p>
+                     <p>Đơn hàng của bạn : <span><?= $fetch_orders['total_products']; ?></span></p>
+                     <p>Tổng giá : <span><?php echo currency_format($fetch_orders['total_price']); ?></span></p>
+                     <p> Trạng thái thanh toán : <span style="color:<?php if ($fetch_orders['payment_status'] == 'pending') {
+                                                                        echo 'red';
+                                                                     } else {
+                                                                        echo 'green';
+                                                                     }; ?>"><?php
+                                                                              if ($fetch_orders['payment_status'] == 'pending') {
+                                                                                 echo "Chưa giải quyết";
+                                                                              } else {
+                                                                                 echo "Hoàn thành";
+                                                                              }
+                                                                              ?></span> </p>
+                  </div>
+         <?php
+               }
+            } else {
+               echo '<p class="empty">Chưa có đơn đặt hàng!</p>';
+            }
+         }
+         ?>
+
+      </div>
+
+   </section>
+
+   <!-- footer section starts  -->
+   <?php include 'components/footer.php'; ?>
+   <!-- footer section ends -->
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+};
+
+include 'components/add_cart.php';
+include './convert_currency.php';
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Sản phẩm</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <!-- header section starts  -->
+   <?php include 'components/user_header.php'; ?>
+   <!-- header section ends -->
+
+   <div class="heading">
+      <h3>Sản phẩm hiện có</h3>
+      <p><a href="home.php">Trang chủ</a> <span> / Sản phẩm</span></p>
+   </div>
+
+   <!-- menu section starts  -->
+
+   <section class="products">
+
+      <h1 class="title">Laptop Bán Chạy</h1>
+
+      <div class="box-container">
+
+         <?php
+         $select_products = $conn->prepare("SELECT * FROM `products`");
+         $select_products->execute();
+         if ($select_products->rowCount() > 0) {
+            while ($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)) {
+         ?>
+               <form action="" method="post" class="box">
+                  <input type="hidden" name="pid" value="<?= $fetch_products['id']; ?>">
+                  <input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
+                  <input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
+                  <input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
+                  <a href="quick_view.php?pid=<?= $fetch_products['id']; ?>" class="fas fa-eye"></a>
+                  <button type="submit" class="fas fa-shopping-cart" name="add_to_cart"></button>
+                  <img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
+                  <a href="category.php?category=<?= $fetch_products['category']; ?>" class="cat"><?= $fetch_products['category']; ?></a>
+                  <div class="name"><?= $fetch_products['name']; ?></div>
+                  <div class="flex">
+                     <div class="price"> <?php echo currency_format($fetch_products['price']); ?></div>
+
+                     <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2">
+                  </div>
+               </form>
+         <?php
+            }
+         } else {
+            echo '<p class="empty">Hiện chưa có sản phẩm để hiển thị!</p>';
+         }
+         ?>
+
+      </div>
+
+   </section>
+
+
+   <!-- menu section ends -->
+
+
+   <!-- footer section starts  -->
+   <?php include 'components/footer.php'; ?>
+   <!-- footer section ends -->
+
+
+   <!-- custom js file link  -->
+   <script src=" js/script.js"></script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+   header('location:home.php');
+};
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Thông tin cá nhân</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <!-- header section starts  -->
+   <?php include 'components/user_header.php'; ?>
+   <!-- header section ends -->
+
+   <section class="user-details">
+
+      <div class="user">
+         <img src="imgs/user-icon.png" alt="">
+         <p><i class="fas fa-user"></i><span><span><?= $fetch_profile['name']; ?></span></span></p>
+         <p><i class="fas fa-phone"></i><span><?= $fetch_profile['number']; ?></span></p>
+         <p><i class="fas fa-envelope"></i><span><?= $fetch_profile['email']; ?></span></p>
+         <a href="update_profile.php" class="btn">Cập nhật thông tin</a>
+         <p class="address"><i class="fas fa-map-marker-alt"></i><span><?php if ($fetch_profile['address'] == '') {
+                                                                           echo 'Vui lòng nhập địa chỉ';
+                                                                        } else {
+                                                                           echo $fetch_profile['address'];
+                                                                        } ?></span></p>
+         <a href="update_address.php" class="btn">Cập nhật địa chỉ</a>
+      </div>
+
+   </section>
+
+
+
+
+
+
+
+
+
+
+   <?php include 'components/footer.php'; ?>
+
+
+
+
+
+
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+};
+
+include 'components/add_cart.php';
+include './convert_currency.php';
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Xem chi tiết sản phẩm</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <?php include 'components/user_header.php'; ?>
+
+   <section class="quick-view">
+
+      <h1 class="title">Chi tiết sản phẩm</h1>
+
+      <?php
+      $pid = $_GET['pid'];
+      $select_products = $conn->prepare("SELECT * FROM `products` WHERE id = ?");
+      $select_products->execute([$pid]);
+      if ($select_products->rowCount() > 0) {
+         while ($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)) {
+      ?>
+            <form action="" method="post" class="box">
+               <input type="hidden" name="pid" value="<?= $fetch_products['id']; ?>">
+               <input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
+               <input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
+               <input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
+               <img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
+               <a href="category.php?category=<?= $fetch_products['category']; ?>" class="cat"><?= $fetch_products['category']; ?></a>
+               <div class="name"><?= $fetch_products['name']; ?></div>
+               <div class="flex">
+                  <div class="price"><?php echo currency_format($fetch_products['price']); ?></div>
+                  <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2">
+               </div>
+               <button type="submit" name="add_to_cart" class="cart-btn">Thêm vào giỏ hàng</button>
+            </form>
+      <?php
+         }
+      } else {
+         echo '<p class="empty">Chưa có sản phẩm để hiển thị!</p>';
+      }
+      ?>
+
+   </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   <?php include 'components/footer.php'; ?>
+
+
+   <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+
+</body>
+
+</html>
+# Website bán laptop
+## Dự án môn công nghệ phầm mềm
+### Hình ảnh demo <br/>
+![Trang chủ](./img_demo/Home.png?raw=true "Home")<br/>
+![Giới thiệu](./img_demo/About.png?raw=true "About")<br/>
+![Sản phẩm](./img_demo/Product.png?raw=true "Product")<br/>
+![Đặt hàng](./img_demo/Orders.png?raw=true "Orders")<br/>
+![Liên hệ](./img_demo/Contact.png?raw=true "Contact")<br/>
+![Giỏ hàng](./img_demo/Cart.png?raw=true "Cart")<br/>
+![Thông tin cá nhân](./img_demo/Profile.png?raw=true "Profile")<br/>
+### Admin <br/>
+![Admin Dashboard](./img_demo/Admin.PNG?raw=true "Admin")<br/>
+# LaptopWebsite
+
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+};
+
+if (isset($_POST['submit'])) {
+
+   $name = $_POST['name'];
+   $name = filter_var($name, FILTER_SANITIZE_STRING);
+   $email = $_POST['email'];
+   $email = filter_var($email, FILTER_SANITIZE_STRING);
+   $number = $_POST['number'];
+   $number = filter_var($number, FILTER_SANITIZE_STRING);
+   $pass = sha1($_POST['pass']);
+   $pass = filter_var($pass, FILTER_SANITIZE_STRING);
+   $cpass = sha1($_POST['cpass']);
+   $cpass = filter_var($cpass, FILTER_SANITIZE_STRING);
+
+   $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ? OR number = ?");
+   $select_user->execute([$email, $number]);
+   $row = $select_user->fetch(PDO::FETCH_ASSOC);
+
+   if ($select_user->rowCount() > 0) {
+      $message[] = 'Email hoặc số điện thoại đã tồn tại!';
+   } else {
+      if ($pass != $cpass) {
+         $message[] = 'Mật khẩu không khớp!';
+      } else {
+         $insert_user = $conn->prepare("INSERT INTO `users`(name, email, number, password) VALUES(?,?,?,?)");
+         $insert_user->execute([$name, $email, $number, $cpass]);
+         $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ? AND password = ?");
+         $select_user->execute([$email, $pass]);
+         $row = $select_user->fetch(PDO::FETCH_ASSOC);
+         if ($select_user->rowCount() > 0) {
+            $_SESSION['user_id'] = $row['id'];
+            header('location:home.php');
+         }
+      }
+   }
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Đăng ký</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <!-- header section starts  -->
+   <?php include 'components/user_header.php'; ?>
+   <!-- header section ends -->
+
+   <section class="form-container">
+
+      <form action="" method="post">
+         <h3>Đăng ký</h3>
+         <input type="text" name="name" required placeholder="Nhập họ và tên của bạn" class="box" maxlength="50">
+         <input type="email" name="email" required placeholder="Nhập email của bạn" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+         <input type="number" name="number" required placeholder="Nhập số điện thoại" class="box" min="0" max="9999999999" maxlength="10">
+         <input type="password" name="pass" required placeholder="Nhập mật khẩu của bạn" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+         <input type="password" name="cpass" required placeholder="Xác nhận lại mật khẩu" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+         <input type="submit" value="Đăng ký" name="submit" class="btn">
+         <p>Bạn đã có tài khoản? <a href="login.php">Đăng nhập ngay</a></p>
+      </form>
+
+   </section>
+
+
+
+
+
+
+
+
+
+
+
+   <?php include 'components/footer.php'; ?>
+
+
+
+
+
+
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+};
+
+include 'components/add_cart.php';
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Tìm kiếm </title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <!-- header section starts  -->
+   <?php include 'components/user_header.php'; ?>
+   <!-- header section ends -->
+
+   <!-- search form section starts  -->
+
+   <section class="search-form">
+      <form method="post" action="">
+         <input type="text" name="search_box" placeholder="Tên sản phẩm..." class="box">
+         <button type="submit" name="search_btn" class="fas fa-search"></button>
+      </form>
+   </section>
+
+   <!-- search form section ends -->
+
+
+   <section class="products" style="min-height: 100vh; padding-top:0;">
+
+      <div class="box-container">
+
+         <?php
+         if (isset($_POST['search_box']) or isset($_POST['search_btn'])) {
+            $search_box = $_POST['search_box'];
+            $select_products = $conn->prepare("SELECT * FROM `products` WHERE name LIKE '%{$search_box}%'");
+            $select_products->execute();
+            if ($select_products->rowCount() > 0) {
+               while ($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)) {
+         ?>
+                  <form action="" method="post" class="box">
+                     <input type="hidden" name="pid" value="<?= $fetch_products['id']; ?>">
+                     <input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
+                     <input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
+                     <input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
+                     <a href="quick_view.php?pid=<?= $fetch_products['id']; ?>" class="fas fa-eye"></a>
+                     <button type="submit" class="fas fa-shopping-cart" name="add_to_cart"></button>
+                     <img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
+                     <a href="category.php?category=<?= $fetch_products['category']; ?>" class="cat"><?= $fetch_products['category']; ?></a>
+                     <div class="name"><?= $fetch_products['name']; ?></div>
+                     <div class="flex">
+                        <div class="price"><span>$</span><?= $fetch_products['price']; ?></div>
+                        <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2">
+                     </div>
+                  </form>
+         <?php
+               }
+            } else {
+               echo '<p class="empty">Chưa có sản phẩm nào được thêm vào!</p>';
+            }
+         }
+         ?>
+
+      </div>
+
+   </section>
+
+
+
+
+
+
+
+
+
+
+
+   <!-- footer section starts  -->
+   <?php include 'components/footer.php'; ?>
+   <!-- footer section ends -->
+
+
+
+
+
+
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+   header('location:home.php');
+};
+
+if (isset($_POST['submit'])) {
+
+   $address = $_POST['apartment_number'] . ', ' . $_POST['area'] . ', ' . $_POST['town'] . ', ' . $_POST['city'] . ', ' . $_POST['state'] . ', ' . $_POST['country'] . ' - ' . $_POST['pin_code'];
+   $address = filter_var($address, FILTER_SANITIZE_STRING);
+
+   $update_address = $conn->prepare("UPDATE `users` set address = ? WHERE id = ?");
+   $update_address->execute([$address, $user_id]);
+
+   $message[] = 'Đã lưu địa chỉ.';
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Cập nhật địa chỉ</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <?php include 'components/user_header.php' ?>
+
+   <section class="form-container">
+
+      <form action="" method="post">
+         <h3>Địa chỉ của bạn</h3>
+         <input type="text" class="box" placeholder="Số nhà" required maxlength="50" name="apartment_number">
+         <input type="text" class="box" placeholder="Đường" required maxlength="50" name="area">
+         <input type="text" class="box" placeholder="Phường" required maxlength="50" name="town">
+         <input type="text" class="box" placeholder="Thành phố" required maxlength="50" name="city">
+         <input type="text" class="box" placeholder="Tỉnh" required maxlength="50" name="state">
+         <input type="text" class="box" placeholder="Quốc gia" required maxlength="50" name="country">
+         <input type="number" class="box" placeholder="Mã bưu điện" required max="999999" min="0" maxlength="6" name="pin_code">
+         <input type="submit" value="Lưu địa chỉ" name="submit" class="btn">
+      </form>
+
+   </section>
+
+   <?php include 'components/footer.php' ?>
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+   header('location:home.php');
+};
+
+if (isset($_POST['submit'])) {
+
+   $name = $_POST['name'];
+   $name = filter_var($name, FILTER_SANITIZE_STRING);
+
+   $email = $_POST['email'];
+   $email = filter_var($email, FILTER_SANITIZE_STRING);
+   $number = $_POST['number'];
+   $number = filter_var($number, FILTER_SANITIZE_STRING);
+
+   if (!empty($name)) {
+      $update_name = $conn->prepare("UPDATE `users` SET name = ? WHERE id = ?");
+      $update_name->execute([$name, $user_id]);
+   }
+
+   if (!empty($email)) {
+      $select_email = $conn->prepare("SELECT * FROM `users` WHERE email = ?");
+      $select_email->execute([$email]);
+      if ($select_email->rowCount() > 0) {
+         $message[] = 'Email đã tồn tại rồi!';
+      } else {
+         $update_email = $conn->prepare("UPDATE `users` SET email = ? WHERE id = ?");
+         $update_email->execute([$email, $user_id]);
+      }
+   }
+
+   if (!empty($number)) {
+      $select_number = $conn->prepare("SELECT * FROM `users` WHERE number = ?");
+      $select_number->execute([$number]);
+      if ($select_number->rowCount() > 0) {
+         $message[] = 'Số điện thoại đã tồn tại rồi!';
+      } else {
+         $update_number = $conn->prepare("UPDATE `users` SET number = ? WHERE id = ?");
+         $update_number->execute([$number, $user_id]);
+      }
+   }
+
+   $empty_pass = 'da39a3ee5e6b4b0d3255bfef95601890afd80709';
+   $select_prev_pass = $conn->prepare("SELECT password FROM `users` WHERE id = ?");
+   $select_prev_pass->execute([$user_id]);
+   $fetch_prev_pass = $select_prev_pass->fetch(PDO::FETCH_ASSOC);
+   $prev_pass = $fetch_prev_pass['password'];
+   $old_pass = sha1($_POST['old_pass']);
+   $old_pass = filter_var($old_pass, FILTER_SANITIZE_STRING);
+   $new_pass = sha1($_POST['new_pass']);
+   $new_pass = filter_var($new_pass, FILTER_SANITIZE_STRING);
+   $confirm_pass = sha1($_POST['confirm_pass']);
+   $confirm_pass = filter_var($confirm_pass, FILTER_SANITIZE_STRING);
+
+   if ($old_pass != $empty_pass) {
+      if ($old_pass != $prev_pass) {
+         $message[] = 'Mật khẩu cũ không khớp!';
+      } elseif ($new_pass != $confirm_pass) {
+         $message[] = 'Mật khẩu không khớp!';
+      } else {
+         if ($new_pass != $empty_pass) {
+            $update_pass = $conn->prepare("UPDATE `users` SET password = ? WHERE id = ?");
+            $update_pass->execute([$confirm_pass, $user_id]);
+            $message[] = 'Đã cập nhật mật khẩu thành công!';
+         } else {
+            $message[] = 'Vui lòng nhập mật khẩu mới!';
+         }
+      }
+   }
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Cập nhật thông tin cá nhân</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <!-- header section starts  -->
+   <?php include 'components/user_header.php'; ?>
+   <!-- header section ends -->
+
+   <section class="form-container update-form">
+
+      <form action="" method="post">
+         <h3>Cập nhật thông tin</h3>
+         <input type="text" name="name" placeholder="<?= $fetch_profile['name']; ?>" class="box" maxlength="50">
+         <input type="email" name="email" placeholder="<?= $fetch_profile['email']; ?>" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+         <input type="number" name="number" placeholder="<?= $fetch_profile['number']; ?>"" class=" box" min="0" max="9999999999" maxlength="10">
+         <input type="password" name="old_pass" placeholder="Nhập mật khẩu cũ" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+         <input type="password" name="new_pass" placeholder="Nhập mật khẩu mới" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+         <input type="password" name="confirm_pass" placeholder="Xác nhận mật khẩu" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+         <input type="submit" value="Lưu thông tin" name="submit" class="btn">
+      </form>
+
+   </section>
+
+   <?php include 'components/footer.php'; ?>
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+};
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Giới thiệu</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
+
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <!-- header section starts  -->
+   <?php include 'components/user_header.php'; ?>
+   <!-- header section ends -->
+
+   <div class="heading">
+      <h3>Về chúng tôi</h3>
+      <p><a href="home.php">Trang chủ</a> <span> / Giới thiệu</span></p>
+   </div>
+
+   <!-- about section starts  -->
+
+   <section class="about">
+
+      <div class="row">
+
+         <div class="image">
+            <img src="./imgs/laptop.svg" alt="">
+         </div>
+
+         <div class="content">
+            <h3>Hồ sơ của chúng tôi</h3>
+            <p>Giao hàng toàn quốc, qúy khách hàng vui lòng thanh toán tiền trước, phí ship vui lòng thanh toán cho nhân viên bưu điện lúc nhận hàng. Miễn phí ship khu vực nội thành Đà Lạt</p>
+            <a href="./product.php" class="btn">Sản phẩm</a>
+         </div>
+
+      </div>
+
+   </section>
+
+   <!-- about section ends -->
+
+   <!-- steps section starts  -->
+
+   <section class="steps">
+
+      <h1 class="title">Các bước mua hàng</h1>
+
+      <div class="box-container">
+
+         <div class="box">
+            <img src="imgs/step-1.png" alt="">
+            <h3>Chọn sản phẩm</h3>
+            <p>Nhấn vào sản phẩm muốn mua, thêm vào giỏ hàng và điền thông tin thanh toán.</p>
+         </div>
+
+         <div class="box">
+            <img src="imgs/step-2.png" alt="">
+            <h3>Giao hàng nhanh</h3>
+            <p>Giao hàng toàn quốc trong vòng 3 ngày, quý khách vui lòng thanh toán khi nhận hàng.</p>
+         </div>
+
+         <div class="box">
+            <img src="imgs/step-3.png" alt="">
+            <h3>Đập hộp thôi</h3>
+            <p>Chúc quý khách sử dụng sản phẩm tốt lành, đừng quên giới thiệu cho bạn bè biết.</p>
+         </div>
+
+      </div>
+
+   </section>
+
+   <!-- steps section ends -->
+
+   <!-- reviews section starts  -->
+
+   <section class="reviews">
+
+      <h1 class="title">Đội ngũ nhân viên</h1>
+
+      <div class="swiper reviews-slider">
+
+         <div class="swiper-wrapper">
+
+            <div class="swiper-slide slide">
+               <img src="./imgs/Huy.png" alt="">
+               <h3>Phạm Quang Vinh</h3>
+               <p>Tổ trưởng gương mẫu luôn hết mình với công việc, đạt hiệu xuất làm việc xuất sắc.
+                  Một trong những ứng cử viên cho chiếc ghế giám đốc điều hành tương lai.
+               </p>
+               <div class="stars">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+               </div>
+            </div>
+
+            <div class="swiper-slide slide">
+               <img src="imgs/jack.jpg" alt="">
+               <h3>Nguyễn Minh Hoàng</h3>
+               <p>
+                  Một người lao động, người làm công, người làm thuê, người thợ hay nhân công là người làm công ăn lương, đóng góp lao động và chuyên môn để nỗ lực tạo ra sản phẩm.
+               </p>
+               <div class="stars">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                  <i class="fas fa-star-half-alt"></i>
+               </div>
+            </div>
+
+            <div class="swiper-slide slide">
+               <img src="imgs/jack.jpg" alt="">
+               <h3>Nguyễn Thị Tuyết Ánh</h3>
+               <p>
+                  Một người lao động, người làm công, người làm thuê, người thợ hay nhân công là người làm công ăn lương, đóng góp lao động và chuyên môn để nỗ lực tạo ra sản phẩm.
+               </p>
+               <div class="stars">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+               </div>
+            </div>
+
+            <div class="swiper-slide slide">
+               <img src="imgs/jack.jpg" alt="">
+               <h3>Nguyễn Thu Trang</h3>
+               <p>
+                  Một người lao động, người làm công, người làm thuê, người thợ hay nhân công là người làm công ăn lương, đóng góp lao động và chuyên môn để nỗ lực tạo ra sản phẩm.
+               </p>
+               <div class="stars">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+               </div>
+            </div>
+
+            <div class="swiper-slide slide">
+               <img src="imgs/jack.jpg" alt="">
+               <h3>Trịnh Ngọc Hoàng Anh</h3>
+               <p>
+                  Một người lao động, người làm công, người làm thuê, người thợ hay nhân công là người làm công ăn lương, đóng góp lao động và chuyên môn để nỗ lực tạo ra sản phẩm.
+               </p>
+               <div class="stars">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+               </div>
+            </div>
+
+            <div class="swiper-slide slide">
+               <img src="imgs/mtp.png" alt="">
+               <h3>Nguyễn Thanh Tùng</h3>
+               <p>
+                  Nguyễn Thanh Tùng, thường được biết đến với nghệ danh Sơn Tùng M-TP, là nhân viên mới của shop.
+                  Có khiếu ăn nói nên được khách hàng mến mộ rất nhiều.
+               </p>
+               <div class="stars">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+               </div>
+            </div>
+
+         </div>
+
+         <div class="swiper-pagination"></div>
+
+      </div>
+
+   </section>
+
+   <!-- reviews section ends -->
+
+
+
+
+   <!-- footer section starts  -->
+   <?php include 'components/footer.php'; ?>
+   <!-- footer section ends -->=
+
+
+
+
+
+
+   <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+   <script>
+      var swiper = new Swiper(".reviews-slider", {
+         loop: true,
+         grabCursor: true,
+         spaceBetween: 20,
+         pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+         },
+         breakpoints: {
+            0: {
+               slidesPerView: 1,
+            },
+            700: {
+               slidesPerView: 2,
+            },
+            1024: {
+               slidesPerView: 3,
+            },
+         },
+      });
+   </script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+   header('location:home.php');
+};
+
+if (isset($_POST['delete'])) {
+   $cart_id = $_POST['cart_id'];
+   $delete_cart_item = $conn->prepare("DELETE FROM `cart` WHERE id = ?");
+   $delete_cart_item->execute([$cart_id]);
+   $message[] = 'Item đã được xóa!';
+}
+
+if (isset($_POST['delete_all'])) {
+   $delete_cart_item = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
+   $delete_cart_item->execute([$user_id]);
+   // header('location:cart.php');
+   $message[] = 'Đã xóa tất cả khỏi giỏ hàng!';
+}
+
+if (isset($_POST['update_qty'])) {
+   $cart_id = $_POST['cart_id'];
+   $qty = $_POST['qty'];
+   $qty = filter_var($qty, FILTER_SANITIZE_STRING);
+   $update_qty = $conn->prepare("UPDATE `cart` SET quantity = ? WHERE id = ?");
+   $update_qty->execute([$qty, $cart_id]);
+   $message[] = 'Số lượng đã được cập nhật';
+}
+
+$grand_total = 0;
+
+include './convert_currency.php';
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Giỏ hàng</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <!-- header section starts  -->
+   <?php include 'components/user_header.php'; ?>
+   <!-- header section ends -->
+
+   <div class="heading">
+      <h3>Thông tin giỏ hàng</h3>
+      <p><a href="home.php">Trang chủ</a> <span> / Giỏ hàng</span></p>
+   </div>
+
+   <!-- shopping cart section starts  -->
+
+   <section class="products">
+
+      <h1 class="title">Đơn hàng của bạn</h1>
+
+      <div class="box-container">
+
+         <?php
+         $grand_total = 0;
+         $select_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+         $select_cart->execute([$user_id]);
+         if ($select_cart->rowCount() > 0) {
+            while ($fetch_cart = $select_cart->fetch(PDO::FETCH_ASSOC)) {
+         ?>
+               <form action="" method="post" class="box">
+                  <input type="hidden" name="cart_id" value="<?= $fetch_cart['id']; ?>">
+                  <a href="quick_view.php?pid=<?= $fetch_cart['pid']; ?>" class="fas fa-eye"></a>
+                  <button type="submit" class="fas fa-times" name="delete" onclick="return confirm('Xóa sản phẩm này?');"></button>
+                  <img src="uploaded_img/<?= $fetch_cart['image']; ?>" alt="">
+                  <div class="name"><?= $fetch_cart['name']; ?></div>
+                  <div class="flex">
+                     <div class="price"><?php echo currency_format($fetch_cart['price']); ?></div>
+
+                     <input type="number" name="qty" class="qty" min="1" max="99" value="<?= $fetch_cart['quantity']; ?>" maxlength="2">
+                     <button type="submit" class="fas fa-edit" name="update_qty"></button>
+                  </div>
+                  <div class="sub-total"> Tổng chi phí :
+                     <span>
+                        <?php
+                        $sub_total = ($fetch_cart['price'] * $fetch_cart['quantity']);
+                        echo currency_format($sub_total) ?>
+                     </span>
+                  </div>
+               </form>
+         <?php
+               $grand_total += $sub_total;
+            }
+         } else {
+            echo '<p class="empty">Giỏ hàng bạn không có gì!</p>';
+         }
+         ?>
+
+      </div>
+
+      <div class="cart-total">
+         <p>Tổng tiền : <span><?php echo currency_format($grand_total); ?></span></p>
+
+         <a href="checkout.php" class="btn <?= ($grand_total > 1) ? '' : 'disabled'; ?>">Tiến hành thanh toán</a>
+      </div>
+
+      <div class="more-btn">
+         <form action="" method="post">
+            <button type="submit" class="delete-btn <?= ($grand_total > 1) ? '' : 'disabled'; ?>" name="delete_all" onclick="return confirm('Bạn có chắc muốn xóa tất cả?');">Xóa tất cả</button>
+         </form>
+         <a href="./product.php" class="btn">Tiếp tục mua sắm</a>
+      </div>
+
+   </section>
+
+   <!-- shopping cart section ends -->
+
+   <!-- footer section starts  -->
+   <?php include 'components/footer.php'; ?>
+   <!-- footer section ends -->
+
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+};
+
+include 'components/add_cart.php';
+include './convert_currency.php';
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Loại laptop</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <?php include 'components/user_header.php'; ?>
+
+   <section class="products">
+
+      <h1 class="title">Loại laptop</h1>
+
+      <div class="box-container">
+
+         <?php
+         $category = $_GET['category'];
+         $select_products = $conn->prepare("SELECT * FROM `products` WHERE category = ?");
+         $select_products->execute([$category]);
+         if ($select_products->rowCount() > 0) {
+            while ($fetch_products = $select_products->fetch(PDO::FETCH_ASSOC)) {
+         ?>
+               <form action="" method="post" class="box">
+                  <input type="hidden" name="pid" value="<?= $fetch_products['id']; ?>">
+                  <input type="hidden" name="name" value="<?= $fetch_products['name']; ?>">
+                  <input type="hidden" name="price" value="<?= $fetch_products['price']; ?>">
+                  <input type="hidden" name="image" value="<?= $fetch_products['image']; ?>">
+                  <a href="quick_view.php?pid=<?= $fetch_products['id']; ?>" class="fas fa-eye"></a>
+                  <button type="submit" class="fas fa-shopping-cart" name="add_to_cart"></button>
+                  <img src="uploaded_img/<?= $fetch_products['image']; ?>" alt="">
+                  <div class="name"><?= $fetch_products['name']; ?></div>
+                  <div class="flex">
+                     <div class="price"> <?php echo currency_format($fetch_products['price']); ?></div>
+                     <input type="number" name="qty" class="qty" min="1" max="99" value="1" maxlength="2">
+                  </div>
+               </form>
+         <?php
+            }
+         } else {
+            echo '<p class="empty">Hiện chưa có sản phẩm!</p>';
+         }
+         ?>
+
+      </div>
+
+   </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   <?php include 'components/footer.php'; ?>
+
+
+   <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+   header('location:home.php');
+};
+
+if (isset($_POST['submit'])) {
+
+   $name = $_POST['name'];
+   $name = filter_var($name, FILTER_SANITIZE_STRING);
+   $number = $_POST['number'];
+   $number = filter_var($number, FILTER_SANITIZE_STRING);
+   $email = $_POST['email'];
+   $email = filter_var($email, FILTER_SANITIZE_STRING);
+   $method = $_POST['method'];
+   $method = filter_var($method, FILTER_SANITIZE_STRING);
+   $address = $_POST['address'];
+   $address = filter_var($address, FILTER_SANITIZE_STRING);
+   $total_products = $_POST['total_products'];
+   $total_price = $_POST['total_price'];
+
+   $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+   $check_cart->execute([$user_id]);
+
+   if ($check_cart->rowCount() > 0) {
+
+      if ($address == '') {
+         $message[] = 'Vui lòng thêm địa chỉ của bạn!';
+      } else {
+
+         $insert_order = $conn->prepare("INSERT INTO `orders`(user_id, name, number, email, method, address, total_products, total_price) VALUES(?,?,?,?,?,?,?,?)");
+         $insert_order->execute([$user_id, $name, $number, $email, $method, $address, $total_products, $total_price]);
+
+         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
+         $delete_cart->execute([$user_id]);
+
+         $message[] = 'Đặt hàng thành công!';
+      }
+   } else {
+      $message[] = 'Giỏ hàng của bạn không có gì!';
+   }
+}
+include './convert_currency.php';
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Thanh toán</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <!-- header section starts  -->
+   <?php include 'components/user_header.php'; ?>
+   <!-- header section ends -->
+
+   <div class="heading">
+      <h3>Thủ tục thanh toán</h3>
+      <p><a href="home.php">Trang chủ</a> <span> / Thanh toán</span></p>
+   </div>
+
+   <section class="checkout">
+
+      <h1 class="title">Tổng đơn hàng</h1>
+
+      <form action="" method="post">
+
+         <div class="cart-items">
+            <h3>Các mặt hàng trong giỏ hàng</h3>
+            <?php
+            $grand_total = 0;
+            $cart_items[] = '';
+            $select_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+            $select_cart->execute([$user_id]);
+            if ($select_cart->rowCount() > 0) {
+               while ($fetch_cart = $select_cart->fetch(PDO::FETCH_ASSOC)) {
+                  $cart_items[] = $fetch_cart['name'] . ' (' . currency_format($fetch_cart['price']) . ' x ' . $fetch_cart['quantity'] . ')';
+                  $total_products = implode($cart_items);
+                  $grand_total += ($fetch_cart['price'] * $fetch_cart['quantity']);
+            ?>
+                  <p><span class="name"><?= $fetch_cart['name']; ?></span><span class="price"><?php echo currency_format($fetch_cart['price']); ?> x <?= $fetch_cart['quantity']; ?></span></p>
+
+            <?php
+               }
+            } else {
+               echo '<p class="empty">Giỏ hàng của bạn không có gì!</p>';
+            }
+            ?>
+            <p class="grand-total"><span class="name">Tổng cộng :</span><span class="price"><?php echo currency_format($grand_total); ?></span></p>
+            <a href="cart.php" class="btn">Xem giỏ hàng</a>
+         </div>
+
+         <input type="hidden" name="total_products" value="<?= $total_products; ?>">
+         <input type="hidden" name="total_price" value="<?= $grand_total; ?>" value="">
+         <input type="hidden" name="name" value="<?= $fetch_profile['name'] ?>">
+         <input type="hidden" name="number" value="<?= $fetch_profile['number'] ?>">
+         <input type="hidden" name="email" value="<?= $fetch_profile['email'] ?>">
+         <input type="hidden" name="address" value="<?= $fetch_profile['address'] ?>">
+
+         <div class="user-info">
+            <h3>Thông tin của bạn</h3>
+            <p><i class="fas fa-user"></i><span><?= $fetch_profile['name'] ?></span></p>
+            <p><i class="fas fa-phone"></i><span><?= $fetch_profile['number'] ?></span></p>
+            <p><i class="fas fa-envelope"></i><span><?= $fetch_profile['email'] ?></span></p>
+            <a href="update_profile.php" class="btn">Cập nhật thông tin</a>
+            <h3>Địa chỉ giao hàng</h3>
+            <p><i class="fas fa-map-marker-alt"></i><span><?php if ($fetch_profile['address'] == '') {
+                                                               echo 'Vui lòng nhập địa chỉ của bạn!';
+                                                            } else {
+                                                               echo $fetch_profile['address'];
+                                                            } ?></span></p>
+            <a href="update_address.php" class="btn">Cập nhật địa chỉ</a>
+            <select name="method" class="box" required>
+               <option value="" disabled selected>Chọn phương thức thanh toán --</option>
+               <option value="MoMo">MoMo</option>
+               <option value="ZaloPay">ZaloPay</option>
+               <option value="Visa">Visa</option>
+               <option value="PayPal">PayPal</option>
+            </select>
+            <input type="submit" value="Đặt Hàng" class="btn <?php if ($fetch_profile['address'] == '') {
+                                                                  echo 'disabled';
+                                                               } ?>" style="width:100%; background:var(--red); color:var(--white);" name="submit">
+         </div>
+
+      </form>
+
+   </section>
+
+
+
+
+
+
+
+
+
+   <!-- footer section starts  -->
+   <?php include 'components/footer.php'; ?>
+   <!-- footer section ends -->
+
+
+
+
+
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+</body>
+
+</html>
+<?php
+
+include 'components/connect.php';
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   $user_id = '';
+};
+
+if (isset($_POST['send'])) {
+
+   $name = $_POST['name'];
+   $name = filter_var($name, FILTER_SANITIZE_STRING);
+   $email = $_POST['email'];
+   $email = filter_var($email, FILTER_SANITIZE_STRING);
+   $number = $_POST['number'];
+   $number = filter_var($number, FILTER_SANITIZE_STRING);
+   $msg = $_POST['msg'];
+   $msg = filter_var($msg, FILTER_SANITIZE_STRING);
+
+   $select_message = $conn->prepare("SELECT * FROM `messages` WHERE name = ? AND email = ? AND number = ? AND message = ?");
+   $select_message->execute([$name, $email, $number, $msg]);
+
+   if ($select_message->rowCount() > 0) {
+      $message[] = 'Đã tồn tại lời nhắn!';
+   } else {
+
+      $insert_message = $conn->prepare("INSERT INTO `messages`(user_id, name, email, number, message) VALUES(?,?,?,?,?)");
+      $insert_message->execute([$user_id, $name, $email, $number, $msg]);
+
+      $message[] = 'Gửi lời nhắn thành công!';
+   }
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Liên hệ</title>
+   <link rel="shortcut icon" href="./imgs/icon.png" type="image/x-icon">
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+   <!-- header section starts  -->
+   <?php include 'components/user_header.php'; ?>
+   <!-- header section ends -->
+
+   <div class="heading">
+      <h3>Liên hệ với chúng tôi</h3>
+      <p><a href="home.php">Trang chủ</a> <span> / liên hệ</span></p>
+   </div>
+
+   <!-- contact section starts  -->
+
+   <section class="contact">
+
+      <div class="row">
+
+         <div class="image">
+            <img src="imgs/contact-img.svg" alt="">
+         </div>
+
+         <form action="" method="post">
+            <h3>Bạn mong muốn gì nào?</h3>
+            <input type="text" name="name" maxlength="50" class="box" placeholder="Nhập tên của bạn" required>
+            <input type="number" name="number" min="0" max="9999999999" class="box" placeholder="Nhập số điện thoại" required maxlength="10">
+            <input type="email" name="email" maxlength="50" class="box" placeholder="Nhập email của bạn" required>
+            <textarea name="msg" class="box" required placeholder="Lời nhắn của bạn" maxlength="500" cols="30" rows="10"></textarea>
+            <input type="submit" value="Gửi lời nhắn" name="send" class="btn">
+         </form>
+
+      </div>
+
+   </section>
+
+   <!-- footer section starts  -->
+   <?php include 'components/footer.php'; ?>
+   <!-- footer section ends -->
+
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+</body>
+
+</html>
